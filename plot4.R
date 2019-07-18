@@ -1,0 +1,23 @@
+library(dplyr)
+mytable<-read.table("household_power_consumption.txt",na.strings = "?",sep=";")
+names(mytable)<-c("Date","Time","GApower","GRpower","Voltage","Gintensity","s_m1","s_m2","s_m3")
+mytable1<-subset(mytable,Date=="1/2/2007" | Date == "2/2/2007")
+mytable1$Date <- as.Date(mytable1$Date, format = "%d%m%Y")
+mytable1$Time <- strptime(mytable1$Time, format = "%H:%M:%S")
+mytable1[1:1440,"Time"] <- format(mytable1[1:1440,"Time"],"2007-02-01 %H:%M:%S")
+mytable1[1441:2880,"Time"] <- format(mytable1[1441:2880,"Time"],"2007-02-02 %H:%M:%S")
+par(mfrow = c(2,2))
+with(mytable1,{
+  plot(mytable1$Time, as.numeric(as.character(mytable1$GApower)), type = "l", xlab = "", ylab = "Global Active Power(Kilowatts)")
+  plot(mytable1$Time, as.numeric(as.character(mytable1$Voltage)), type = "l", xlab = "datetime", ylab = "Voltage")
+  plot(mytable1$Time, as.numeric(as.character(mytable1$s_m1)), type = "l", xlab = "", ylab = "Energy Sub Metering") 
+  with(mytable1, lines(Time, as.numeric(as.character(s_m1))))
+  with(mytable1, lines(Time, as.numeric(as.character(s_m2)), col = "red"))
+  with(mytable1, lines(Time, as.numeric(as.character(s_m3)), col = "blue"))
+  legend("topright", lty = 1, col = c("black", "red", "blue"), 
+         legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"),
+         bty = "n",cex=0.3)
+  plot(mytable1$Time, as.numeric(as.character(mytable1$GRpower)), type = "l", xlab = "datetime", ylab = "Global_Reactive_Power") 
+}) 
+dev.copy(png, file = "plot4.png", height = 480, width = 480)
+dev.off()

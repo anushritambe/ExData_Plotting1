@@ -1,0 +1,12 @@
+library(dplyr)
+mytable<-read.table("household_power_consumption.txt",na.strings = "?",sep=";")
+names(mytable)<-c("Date","Time","GApower","GRpower","Voltage","Gintensity","s_m1","s_m2","s_m3")
+mytable1<-subset(mytable,Date=="1/2/2007" | Date == "2/2/2007")
+mytable1$Date <- as.Date(mytable1$Date, format = "%d%m%Y")
+mytable1$Time <- strptime(mytable1$Time, format = "%H:%M:%S")
+mytable1[1:1440,"Time"] <- format(mytable1[1:1440,"Time"],"2007-02-01 %H:%M:%S")
+mytable1[1441:2880,"Time"] <- format(mytable1[1441:2880,"Time"],"2007-02-02 %H:%M:%S")
+plot(mytable1$Time, as.numeric(as.character(mytable1$GApower)), type = "l", xlab = "", ylab = "Global Active Power(Kilowatts)")
+dev.copy(png, file = "plot2.png", height = 480, width = 480)
+dev.off()
+
